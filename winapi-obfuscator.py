@@ -4,6 +4,7 @@ import os
 import json
 import string
 from random import choice
+import argparse
 
 class Grepper:
     __header_files = [
@@ -31,7 +32,7 @@ class Grepper:
             file_content = input_file.read()
             self.__functions_list = re.findall(self.__pattern, file_content, flags=re.I|re.M)
 
-    def __populate_data_dictect(self, library_name):
+    def __populate_data_dict(self, library_name):
         for function in self.__functions_list:
             #<useless> <data type> WINAPI|NTAPI <function name>(parameters) {stuff}; 
             # = <data type> WINAPI/NTAPI <functio name>(parameters);
@@ -58,7 +59,7 @@ class Grepper:
     def grep(self):
         for file in self.__header_files:
             self.__find_functions(self.windows_sdk_path+file[0])
-            self.__populate_data_dictect(file[1],)
+            self.__populate_data_dict(file[1],)
         return self.__data_dict
 
 class Encryption:
@@ -167,20 +168,24 @@ class Obfuscation(Encryption):
         #obfuscate libraries
         for library in self.__libraries:
             self.obfuscator(library,True)
-        #save in file
-        return self.__output_obj
 
+        return [self.__output_obj, self.__missing_functions]
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--windows-sdk","-s",help="Windows SDK path which is usually located at 'C:\Program Files (x86)\Windows Kits\\<windows version>\Include\\<version>'.", dest="windows_sdk",required=True)
+    parser.add_argument("--function-names","-f",help="function names separated by ','.",dest="function_names",required=True)
+    parser.add_argument("--key-length","-l",help="XOR key length. default is '10'.",dest="key_length",default=10)
+    return parser.parse_args()
 
 if __name__ == "__main__":
 
-    if len(sys.argv) < 3:
-        print(f"python {sys.argv[0]} <windows_sdk_path> <function_names>")
-        print("\t<windows_sdk_path> - usually in 'C:\Program Files (x86)\Windows Kits\\<windows version>\Include\\<version>' .")
-        print("\t<function_names> - separated by ','.")
-        exit(1)
+    options = parse_args()
 
-    windows_sdk = sys.argv[1]
-    function_names = sys.argv[2].split(',')
+    windows_sdk = options.windows_sdk
+    function_names = options.function_names.split(',')
+    key_length = int(options.key_length)
     data_dict = {}
 
     if "data.json" not in os.listdir(os.curdir):
@@ -197,8 +202,8 @@ if __name__ == "__main__":
             data_dict = json.loads(f.read())
 
     # obfuscate
-    obfuscation = Obfuscation(data_dict,function_names,10)
-    output_obj = obfuscation.obfuscate()
+    obfuscation = Obfuscation(data_dict,function_names,key_length)
+    output_obj, missing_functions = obfuscation.obfuscate()
 
     # save in file
     for key in list(output_obj.keys()):
@@ -209,3 +214,7 @@ if __name__ == "__main__":
         with open("all.txt","a") as f:
             f.write("\n")
             f.close()
+
+    # missing functions
+    for function in missing_functions:
+        print(f"[!] {function} is missing.")

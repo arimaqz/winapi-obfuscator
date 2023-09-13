@@ -7,9 +7,7 @@ note that it is for educational purposes and I'm not responsible for any harm th
 
 usage:
 ```
-python winapi-obfuscator.py <windows_sdk_path> <function_names>
-    <windows_sdk_path> - usually in 'C:\Program Files (x86)\Windows Kits\<windows version>\Include\<version>' .
-    <function_names> - separated by ','.p
+python winapi-obfuscator.py [-h] --windows-sdk WINDOWS_SDK --function-names FUNCTION_NAMES [--key-length KEY_LENGTH]
 ```
 
 ### Grepper
@@ -72,7 +70,7 @@ pMessageBoxA messageBoxA = (pMessageBoxA)GetProcAddress(LoadLibraryA((LPCSTR)sUs
 ## Example
 
 ```
-python winapi-obfuscator.py "C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0" MessageBoxA
+python winapi-obfuscator.py -s "C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0" -f MessageBoxA
 ```
 
 <b>data.json</b>
