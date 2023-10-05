@@ -19,6 +19,7 @@ options:
                         XOR key length. default is '10'.
   --encrypt-only, -o    only return encrypted function/library names and their keys.
 ```
+<b>Note:</b> due to the nature of the regexp in use, some signatures may not be grepped! if you have found any problems please do inform me through issues.
 
 ### Grepper
 grepper functionality finds function signatures in the windows SDK folder you specify which is usually located in `C:\Program Files (x86)\Windows Kits\<windows version>\Include\<version>`.
