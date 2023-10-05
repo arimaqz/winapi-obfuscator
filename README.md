@@ -47,7 +47,7 @@ after grepping through all the defined windows header files it generates a `data
 #### Windows header files
 list of windows header files i've found till now(not at all complete):
 ```python
- __header_files = [
+__header_files = [
     [r"\um\winuser.h","user32.dll"],
     [r"\um\memoryapi.h","kernel32.dll"],
     [r"\um\psapi.h","kernel32.dll"],
@@ -55,7 +55,12 @@ list of windows header files i've found till now(not at all complete):
     [r"\um\debugapi.h","kernel32.dll"],
     [r"\um\processthreadsapi.h","kernel32.dll"],
     [r"\um\fileapi.h","kernel32.dll"],
-    [r"\um\libloaderapi.h","kernel32.dll"]
+    [r"\um\libloaderapi.h","kernel32.dll"],
+    [r"\um\WtsApi32.h","wtsapi32.dll"],
+    [r"\um\shellapi.h","shell32.dll"],
+    [r"\um\Shlwapi.h","Shlwapi.dll"],
+    [r"\um\wincrypt.h","Crypt32.dll"],       
+    [r"\um\winbase.h","kernel32.dll"]       
 ]
 ```
 the script greps through these header files for function signatures.
