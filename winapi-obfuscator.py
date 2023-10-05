@@ -15,10 +15,15 @@ class Grepper:
         [r"\um\debugapi.h","kernel32.dll"],
         [r"\um\processthreadsapi.h","kernel32.dll"],
         [r"\um\fileapi.h","kernel32.dll"],
-        [r"\um\libloaderapi.h","kernel32.dll"]
+        [r"\um\libloaderapi.h","kernel32.dll"],
+        [r"\um\WtsApi32.h","wtsapi32.dll"],
+        [r"\um\shellapi.h","shell32.dll"],
+        [r"\um\Shlwapi.h","Shlwapi.dll"],
+        [r"\um\wincrypt.h","Crypt32.dll"],       
+        [r"\um\winbase.h","kernel32.dll"]       
     ]
 
-    __pattern = r'^(?!(?:#ifndef|#if))\w+\s+\w*\s*(?:WINAPI|NTAPI)\s+[^_]+\s*\([^;]+\);'
+    __pattern = r'^(?!(?:#ifndef|#if|else))\w+\s+\w*\s*(?:WINAPI|NTAPI)\s+[^_|;|#]+\s*\([^;]+\);'
     __useless = ["WINBASEAPI", "__KERNEL_ENTRY","_Ret_maybenull_", "WINUSERAPI"]
     
     __functions_list = []
