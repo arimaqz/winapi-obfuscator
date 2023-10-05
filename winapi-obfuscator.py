@@ -94,11 +94,12 @@ class Obfuscation(Encryption):
     __output_obj = {"__new_function_definitions":[],"ciphertexts":[],"keys":[],"decryption_function_calls":[],"__resolve_functions":[]}
 
 
-    def __init__(self, data_dict,functions_list,key_length) -> None:
+    def __init__(self, data_dict,functions_list,key_length, encrypt_only) -> None:
         super().__init__(key_length)            
 
         self.data_dict = data_dict
         self.functions_list = functions_list
+        self.encrypt_only = encrypt_only
 
     def __new_function_definition(self,plaintext):
         "save new function definition to file"
@@ -140,22 +141,22 @@ class Obfuscation(Encryption):
 
         ciphertext_value = "{" + ", ".join(hex(x) for x in ciphertext) + "}"
         ciphertext_whole = f"unsigned char {self.__ciphertext_variable_prefix}{plaintext}[] = {ciphertext_value};\n"
+        self.__output_obj["ciphertexts"].append(ciphertext_whole)
         
         key_value = "{" + ", ".join(hex(x) for x in (key.encode()+b"\x00")) + "}"   
         key_whole = f"char {self.__key_variable_prefix}{plaintext}[] = {key_value};\n"
+        self.__output_obj["keys"].append(key_whole)
 
-        decryption_function_call = f"{self.__xor_decryption_function_name}({self.__ciphertext_variable_prefix}{plaintext}, sizeof({self.__ciphertext_variable_prefix}{plaintext}),  {self.__key_variable_prefix}{plaintext}, sizeof({self.__key_variable_prefix}{plaintext}));\n"
-        
-        if not is_library:
+        if not self.encrypt_only:
+            decryption_function_call = f"{self.__xor_decryption_function_name}({self.__ciphertext_variable_prefix}{plaintext}, sizeof({self.__ciphertext_variable_prefix}{plaintext}),  {self.__key_variable_prefix}{plaintext}, sizeof({self.__key_variable_prefix}{plaintext}));\n"
+            self.__output_obj["decryption_function_calls"].append(decryption_function_call)
+
+        if not is_library and not self.encrypt_only:
             __new_function_definition = self.__new_function_definition(plaintext)
             __resolve_function = self.__resolve_function(plaintext)
-        
-        self.__output_obj["ciphertexts"].append(ciphertext_whole)
-        self.__output_obj["keys"].append(key_whole)
-        self.__output_obj["decryption_function_calls"].append(decryption_function_call)
-        if not is_library:
             self.__output_obj["__new_function_definitions"].append(__new_function_definition)
             self.__output_obj["__resolve_functions"].append(__resolve_function)
+        
     
     def obfuscate(self):
         #obfuscate function names
@@ -177,6 +178,7 @@ def parse_args():
     parser.add_argument("--windows-sdk","-s",help="Windows SDK path which is usually located at 'C:\Program Files (x86)\Windows Kits\\<windows version>\Include\\<version>'.", dest="windows_sdk",required=True)
     parser.add_argument("--function-names","-f",help="function names separated by ','.",dest="function_names",required=True)
     parser.add_argument("--key-length","-l",help="XOR key length. default is '10'.",dest="key_length",default=10)
+    parser.add_argument("--encrypt-only", "-o", help="only return encrypted function/library names and their keys.", default=False,action="store_true",dest="encrypt_only")
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -186,6 +188,7 @@ if __name__ == "__main__":
     windows_sdk = options.windows_sdk
     function_names = options.function_names.split(',')
     key_length = int(options.key_length)
+    encrypt_only = options.encrypt_only
     data_dict = {}
 
     if "data.json" not in os.listdir(os.curdir):
@@ -202,7 +205,7 @@ if __name__ == "__main__":
             data_dict = json.loads(f.read())
 
     # obfuscate
-    obfuscation = Obfuscation(data_dict,function_names,key_length)
+    obfuscation = Obfuscation(data_dict,function_names,key_length,encrypt_only)
     output_obj, missing_functions = obfuscation.obfuscate()
 
     # save in file

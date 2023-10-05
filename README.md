@@ -7,7 +7,17 @@ note that it is for educational purposes and I'm not responsible for any harm th
 
 usage:
 ```
-python winapi-obfuscator.py [-h] --windows-sdk WINDOWS_SDK --function-names FUNCTION_NAMES [--key-length KEY_LENGTH]
+winapi-obfuscator.py [-h] --windows-sdk WINDOWS_SDK --function-names FUNCTION_NAMES [--key-length KEY_LENGTH] [--encrypt-only]
+
+options:
+  -h, --help            show this help message and exit
+  --windows-sdk WINDOWS_SDK, -s WINDOWS_SDK
+                        Windows SDK path which is usually located at 'C:\Program Files (x86)\Windows Kits\<windows version>\Include\<version>'.
+  --function-names FUNCTION_NAMES, -f FUNCTION_NAMES
+                        function names separated by ','.
+  --key-length KEY_LENGTH, -l KEY_LENGTH
+                        XOR key length. default is '10'.
+  --encrypt-only, -o    only return encrypted function/library names and their keys.
 ```
 
 ### Grepper
